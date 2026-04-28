@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify, SignJWT } from "jose";
 import { z } from "zod";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? "change-me-min-32-chars-super-secret"
-);
+function getJWTSecret(): Uint8Array {
+  const secret = process.env["JWT_SECRET"];
+  if (!secret) throw new Error("JWT_SECRET environment variable is required");
+  return new TextEncoder().encode(secret);
+}
 
 export interface JWTPayload {
   sub: string;       // userId
@@ -30,12 +32,12 @@ export async function signJWT(payload: Omit<JWTPayload, "iat" | "exp">): Promise
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(getJWTSecret());
 }
 
 export async function verifyJWT(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJWTSecret());
     return payload as unknown as JWTPayload;
   } catch {
     return null;

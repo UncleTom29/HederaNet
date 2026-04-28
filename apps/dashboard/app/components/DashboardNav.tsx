@@ -26,9 +26,13 @@ export default function DashboardNav() {
             href={href}
             className={clsx(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              pathname === href || pathname.startsWith(href + "/")
-                ? "bg-hedera-50 text-hedera-700"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              href === "/dashboard"
+                ? pathname === href
+                  ? "bg-hedera-50 text-hedera-700"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                : pathname === href || pathname.startsWith(href + "/")
+                  ? "bg-hedera-50 text-hedera-700"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             )}
           >
             <Icon className="h-5 w-5" />

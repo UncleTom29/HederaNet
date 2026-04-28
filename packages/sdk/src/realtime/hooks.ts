@@ -55,7 +55,7 @@ export function useHotspotStatus(
   const [data, setData] = useState<HotspotStatus | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
+  const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   const fetchStatus = useCallback(async () => {
     if (!hotspotId) return;
@@ -186,6 +186,7 @@ export function useTradeStatus(tradeId: string | null): {
     let cancelled = false;
 
     const TERMINAL = new Set(["CONFIRMED", "RESOLVED", "CANCELLED"]);
+    let timer: ReturnType<typeof setInterval> | undefined;
 
     const poll = async () => {
       setIsLoading(true);
@@ -205,7 +206,7 @@ export function useTradeStatus(tradeId: string | null): {
     };
 
     void poll();
-    const timer = setInterval(poll, 5_000);
+    timer = setInterval(poll, 5_000);
     return () => {
       cancelled = true;
       clearInterval(timer);

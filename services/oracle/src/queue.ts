@@ -59,7 +59,7 @@ async function processEnergyReading(topic: string, data: Record<string, unknown>
       type: "ENERGY_DELIVERY",
       deviceId,
       value: kwh,
-      metadata: data as never,
+      metadata: data as never, // Prisma Json: data is a validated MQTT payload object
       confirmedCount: 1,
     },
   });
@@ -88,7 +88,7 @@ async function processUptimeReading(topic: string, data: Record<string, unknown>
       deviceId: hotspotId,
       hotspotId,
       value: uptime,
-      metadata: data as never,
+      metadata: data as never, // Prisma Json: data is a validated MQTT payload object
       confirmedCount: 1,
     },
   });
@@ -125,7 +125,7 @@ async function processComputeJob(topic: string, data: Record<string, unknown>) {
       type: "COMPUTE_JOB",
       deviceId: nodeId,
       value: 1,
-      metadata: data as never,
+      metadata: data as never, // Prisma Json: data is a validated MQTT payload object
       confirmedCount: 1,
     },
   });
