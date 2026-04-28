@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       sellerId: operator.id,
       pricePerKwh: data.pricePerKwh,
       availableKwh: data.availableKwh,
-      location: data.location,
+      location: data.location ?? null,
       expiresAt: data.expiresAt ? new Date(data.expiresAt) : null,
     },
   });

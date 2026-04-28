@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Github, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = { title: "About" };
-
-const team = [
-  { name: "Core Contributors", role: "Open-source community" },
-];
 
 export default function AboutPage() {
   return (

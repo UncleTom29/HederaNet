@@ -31,7 +31,7 @@ export default function OperatorsPage() {
               stake: "500 ℏ",
               multiplier: "1.5×",
               color: "bg-gray-50 border-gray-300",
-              badgeVariant: "secondary" as const,
+              badgeVariant: "info" as const,
               perks: ["All Bronze perks", "1.5× reward multiplier", "Priority dispute resolution"],
             },
             {
@@ -46,7 +46,7 @@ export default function OperatorsPage() {
             <div key={t.tier} className={`rounded-xl border p-6 ${t.color}`}>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">{t.tier}</h2>
-                <Badge variant={t.badgeVariant}>{t.multiplier}</Badge>
+                <Badge variant={t.badgeVariant} label={t.multiplier} />
               </div>
               <p className="mb-4 text-2xl font-extrabold text-hedera-700">{t.stake}</p>
               <ul className="space-y-2 text-sm text-gray-600">

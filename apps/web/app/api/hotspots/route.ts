@@ -73,7 +73,12 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   const hotspot = await prisma.hotspot.create({
-    data: { ...data, operatorId: operator.id },
+    data: {
+      ...data,
+      operatorId: operator.id,
+      country: data.country ?? null,
+      city: data.city ?? null,
+    },
   });
 
   return apiResponse(hotspot, 201);
