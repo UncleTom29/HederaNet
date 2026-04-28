@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OperatorTier {
+  BRONZE
+  SILVER
+  GOLD
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum TradeStatus {
+  PENDING
+  CONFIRMED
+  DISPUTED
+  RESOLVED
+  CANCELLED
+}
+
+enum TransactionType {
+  SUBSCRIPTION_PAYMENT
+  ENERGY_PURCHASE
+  ENERGY_SALE
+  STAKING_REWARD
+  UNSTAKE
+  STAKE
+  PLATFORM_FEE
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum OracleReadingType {
+  ENERGY_DELIVERY
+  NETWORK_UPTIME
+  COMPUTE_JOB
+}
+
+enum RewardType {
+  HOTSPOT_UPTIME
+  ENERGY_TRADE
+  COMPUTE_JOB
+  STAKING_BONUS
+  REFERRAL
+}
+
+model User {
+  id          String   @id @default(cuid())
+  accountId   String   @unique
+  displayName String?
+  avatarUrl   String?
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  operator      Operator?
+  subscriptions Subscription[]
+  transactions  Transaction[]
+  reviews       Review[]
+
+  @@index([accountId])
+}
+
+model Operator {
+  id               String       @id @default(cuid())
+  userId           String       @unique
+  accountId        String       @unique
+  tier             OperatorTier @default(BRONZE)
+  stakedAmount     Float        @default(0)
+  slashedAmount    Float        @default(0)
+  rewardMultiplier Float        @default(1.0)
+  totalEarnings    Float        @default(0)
+  isActive         Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id])
+  hotspots       Hotspot[]
+  rewards        Reward[]
+  energyListings EnergyListing[]
+  buyerTrades    Trade[]         @relation("BuyerTrades")
+  sellerTrades   Trade[]         @relation("SellerTrades")
+
+  @@index([accountId])
+  @@index([tier])
+}
+
+model Hotspot {
+  id            String   @id @default(cuid())
+  operatorId    String
+  name          String
+  description   String?
+  latitude      Float
+  longitude     Float
+  bandwidthMbps Float
+  pricePerGb    Float    @default(0)
+  isOnline      Boolean  @default(false)
+  uptimePercent Float    @default(100)
+  lastSeenAt    DateTime?
+  country       String?
+  city          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  operator       Operator       @relation(fields: [operatorId], references: [id])
+  subscriptions  Subscription[]
+  oracleReadings OracleReading[]
+  reviews        Review[]
+
+  @@index([operatorId])
+  @@index([isOnline])
+  @@index([latitude, longitude])
+}
+
+model Subscription {
+  id          String             @id @default(cuid())
+  userId      String
+  hotspotId   String
+  status      SubscriptionStatus @default(ACTIVE)
+  expiresAt   DateTime
+  cancelledAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  hotspot Hotspot @relation(fields: [hotspotId], references: [id])
+
+  @@index([userId])
+  @@index([hotspotId])
+  @@index([status])
+}
+
+model EnergyListing {
+  id            String    @id @default(cuid())
+  sellerId      String
+  pricePerKwh   Float
+  availableKwh  Float
+  location      String?
+  isActive      Boolean   @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  seller Operator @relation(fields: [sellerId], references: [id])
+  trades Trade[]
+
+  @@index([sellerId])
+  @@index([isActive])
+}
+
+model Trade {
+  id         String      @id @default(cuid())
+  listingId  String
+  buyerId    String
+  sellerId   String
+  kwh        Float
+  totalPrice Float
+  status     TradeStatus @default(PENDING)
+  txId       String?     @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  listing EnergyListing @relation(fields: [listingId], references: [id])
+  buyer   Operator      @relation("BuyerTrades", fields: [buyerId], references: [id])
+  seller  Operator      @relation("SellerTrades", fields: [sellerId], references: [id])
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+model OracleReading {
+  id             String            @id @default(cuid())
+  type           OracleReadingType
+  deviceId       String
+  hotspotId      String?
+  value          Float
+  metadata       Json?
+  confirmedCount Int               @default(0)
+  txId           String?           @unique
+  timestamp      DateTime          @default(now())
+
+  hotspot Hotspot? @relation(fields: [hotspotId], references: [id])
+
+  @@index([type])
+  @@index([deviceId])
+  @@index([hotspotId])
+  @@index([timestamp])
+}
+
+model Transaction {
+  id           String            @id @default(cuid())
+  userId       String
+  type         TransactionType
+  amount       Float
+  txId         String?           @unique
+  status       TransactionStatus @default(PENDING)
+  description  String?
+  metadata     Json?
+  confirmedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+}
+
+model Reward {
+  id          String     @id @default(cuid())
+  operatorId  String
+  amount      Float
+  type        RewardType
+  description String?
+  txId        String?    @unique
+  distributed Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+
+  operator Operator @relation(fields: [operatorId], references: [id])
+
+  @@index([operatorId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  hotspotId String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  hotspot Hotspot @relation(fields: [hotspotId], references: [id])
+
+  @@unique([userId, hotspotId])
+  @@index([hotspotId])
+}

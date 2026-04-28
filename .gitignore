@@ -1,0 +1,49 @@
+# Node
+node_modules/
+.pnpm-store/
+.pnpm-debug.log
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+.turbo/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+prisma/migrations/
+
+# Hardhat / Solidity
+artifacts/
+cache/
+typechain-types/
+
+# Coverage
+coverage/
+lcov.info
+
+# Docker
+.dockerignore
+
+# Misc
+*.tsbuildinfo

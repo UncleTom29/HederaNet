@@ -1,0 +1,34 @@
+{
+  "name": "@hederanet/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hederanet/config": "workspace:*",
+    "@hederanet/db": "workspace:*",
+    "@hederanet/sdk": "workspace:*",
+    "@hederanet/ui": "workspace:*",
+    "autoprefixer": "^10.4.17",
+    "eslint-config-next": "^16.2.4",
+    "jose": "^5.2.2",
+    "lucide-react": "^0.344.0",
+    "next": "14.1.0",
+    "postcss": "^8.4.35",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.4.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "typescript": "^5.3.3"
+  }
+}
